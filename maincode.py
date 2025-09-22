@@ -75,23 +75,17 @@ def encryptfile(txtfile):
     seed=random.randint(1,10**9) # a very critical part in encryption, get a random seed
     # seed=472230563 you can remove the comment to force a seed, this may be a user option in the future?
     random.seed(seed) # oops we gotta save the seed or else msg is bricked
-    try: # the funny error catch to solve everyone's lives
-        file=open(txtfile, "r") # put in read mode
-        message=file.read() # then read the whole text in the function
-        for char in message:
-            msg_string=ord(char) # convert the character to the ascii value
-            msg_string=int(msg_string) # just gotta convert it to int
-            msg_string=msg_string*random.randint(1,99) # multiply with the random seed 
-            msg_string=msg_string*random.randint(1,99) # multiply again with the same random seed
-            with open('encrypted_file.txt', 'a') as f: # open the file in append mode (add-on mode)
-                print(msg_string, end=' ', file=f) # printing the string in a sequence of numbers (adds a space too)
-        with open('encrypted_file.txt', 'a') as f:
-            print("\nSeed:", seed, file=f) # gotta print the seed or else bricked message oops :(
-        print("output sent to encrypted_file.txt") # gotta tell the user
-        input("Press enter to continue...")
-    except FileNotFoundError: # finally a catch error
-        print("File,", txtfile, "not found.") # nope, nope, nope, go back user, you suck at this
-        input("Press enter to continue...")
+    file=open(txtfile, "r") # put in read mode
+    message=file.read() # then read the whole text in the function
+    for char in message:
+        msg_string=ord(char) # convert the character to the ascii value
+        msg_string=int(msg_string) # just gotta convert it to int
+        msg_string=msg_string*random.randint(1,99) # multiply with the random seed 
+        msg_string=msg_string*random.randint(1,99) # multiply again with the same random seed
+        with open('encrypted_file.txt', 'a') as f: # open the file in append mode (add-on mode)
+            print(msg_string, end=' ', file=f) # printing the string in a sequence of numbers (adds a space too)
+    with open('encrypted_file.txt', 'a') as f:
+        print("\nSeed:", seed, file=f) # gotta print the seed or else bricked message oops :(
 
 #decrypt function for file
 def decryptfile(txtfile, seed):
