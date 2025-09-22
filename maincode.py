@@ -6,60 +6,69 @@
 # chromebook codespaces supported
 # mac: No
 
-import tkinter
+import tkinter as tk
 import random # import the random library
 import re # an important search/replace library
+from tkinter import filedialog, simpledialog, messagebox
 
-def main(): # we'll never revist this in the program lol
-    encrypt_or_decrypt=input("d to decrypt, e to encry pt: ")
-    if encrypt_or_decrypt == 'd':
-        file_option=input("Input 'file' for txt file, or 'txt' for normaltext: ")
-        decryptchoice(file_option)
-    elif encrypt_or_decrypt == 'e':
-        file_option=input("Input 'file' for txt file, or 'txt' for normal text: ")
-        encryptchoice(file_option)
-    else:
-        print("Try again and write the right letter this time!")
-        input("Press enter to continue...")
-   
-# checks user requested format for decryption, then asks for input
-def decryptchoice(decryptformat): #i shall tell you
-    if decryptformat == 'file': # hmmmm is the input file?
-        txt_file_name=input("Please input your encrypted file, leave blank for default name (encrypted_file.txt): ") #ask to define txt_file_name
-        if txt_file_name == '': # auto input!
-            txt_file_name = 'encrypted_file.txt'# auto fill!
-        decryptfile(txt_file_name) # go to decryptfile()
-    elif decryptformat == 'txt':
-        txtmsg=input("Please input your encrypted message: ") #msg must be manually inputed
-        decrypt(txtmsg)
-    else:
-        print("Try again and write the right letter this time!")
-        input("Press enter to continue...")
+def main():
+    root = tk.Tk()
+    root.title("Encrypt / Decrypt Tool")
+    root.geometry("500x400")
+    show_main_menu(root)
+    root.mainloop()
 
-# checks user requested format for encryption, then asks for input
-def encryptchoice(encryptformat): # same as decryptchoice()
-    if encryptformat == 'file':
-        txt_file_name=input("Please input your raw file: ")
-        encryptfile(txt_file_name)
-    elif encryptformat == 'txt':
-        txtmsg=input("Please input your decrypted message: ")
-        encrypt(txtmsg)
-    else:
-        print("Try again and write the right letter this time!")
-        input("Press enter to continue...")
+def clear(root):
+    for widget in root.winfo_children():
+        widget.destroy()
 
-# encrypt for normal text
-def encrypt(message):
-    seed=random.randint(1,10**9) # look man look at encryptfile()
-    random.seed(seed)
-    for char in message: # look man im not gonna type comments for the same function i wrote in encrpytfile()
-        msg_string=ord(char)
-        msg_string=int(msg_string)
-        msg_string=msg_string*random.randint(1,99)
-        msg_string=msg_string*random.randint(1,99)
-        print(msg_string, end=" ") # more simpler since its just a console msg
-    print("\nSeed:", seed)
-    input("Press enter to continue...") # so the user can see the output before the console closes
+def show_main_menu(root):
+    clear(root)
+    tk.Label(root, text="Do you want to encrypt or decrypt?", font=("Arial", 14)).pack(pady=20)
+
+    tk.Button(root, text="Encrypt File", width=20,
+              command=lambda: encryptchoice("file")).pack(pady=10)
+    tk.Button(root, text="Decrypt File", width=20,
+              command=lambda: decryptchoice("file")).pack(pady=10)
+
+def encryptchoice(_fmt="file"):
+    # pick input file, then run encryptfile
+    filename = filedialog.askopenfilename(
+        title="Select raw text file to encrypt",
+        filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+    )
+    if not filename:
+        messagebox.showinfo("Canceled", "No file selected.")
+        return
+    try:
+        encryptfile(filename)
+        messagebox.showinfo("Done", "Output written to encrypted_file.txt (seed included at end).")
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
+
+def decryptchoice(_fmt="file"):
+    # pick encrypted file, ask for seed, then run decryptfile
+    filename = filedialog.askopenfilename(
+        title="Select encrypted file",
+        filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+    )
+    if not filename:
+        messagebox.showinfo("Canceled", "No file selected.")
+        return
+    seed_str = simpledialog.askstring("Seed required", "Enter seed number printed at the end of the file:")
+    if seed_str is None:
+        messagebox.showinfo("Canceled", "No seed entered.")
+        return
+    try:
+        seed = int(seed_str)
+    except ValueError:
+        messagebox.showerror("Error", "Invalid seed. It must be an integer.")
+        return
+    try:
+        decryptfile(filename, seed)
+        messagebox.showinfo("Done", "Output written to decrypted_file.txt")
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
 # encrypt function for file
 def encryptfile(txtfile):
@@ -84,56 +93,29 @@ def encryptfile(txtfile):
         print("File,", txtfile, "not found.") # nope, nope, nope, go back user, you suck at this
         input("Press enter to continue...")
 
-#decrypt normal message for normal text
-def decrypt(message):
-    seed=input("Please input the seed, it should have been a number printed after your message: ") # gotta ask the seed from user
-    try: # key word TRY
-        seed=int(seed) # suceed
-    except ValueError: # fail lmao
-        print("Invalid seed. Are you serious?") # punch the user "mentally"
+#decrypt function for file
+def decryptfile(txtfile, seed):
+    file=open(txtfile, "r") # man screw this i'm not gonna give you comments figure it out yourself
+    try: # check if user is idiot
+        seed=int(seed) # after that we go on
+    except ValueError:
+        print("Invalid seed. Are you serious?") # user is idiot
         input("Press enter to continue...")
         return
-    random.seed(seed) # gotta set the seed to the inputed seed from the encrypted message
-    textlist=message.split() # split these god forsaken numbers so the program can read 
-    numbers_list=[] # make a table
-    for s in textlist:
-        msg_string=int(s) # convert numbers to int
-        msg_string=msg_string//random.randint(1,99) # divide by the same seed 
-        msg_string=msg_string//random.randint(1,99) # again
-        numbers_list.append(msg_string) # put that to the table
-        result_string= "".join(chr(num) for num in numbers_list) # join the characters together for each string in the table
-    print(result_string) # i finished please leave my family alone and my sleep schedule
-    input("Press enter to continue...")
-
-#decrypt function for file
-def decryptfile(txtfile):
-    try: 
-        file=open(txtfile, "r") # man screw this i'm not gonna give you comments figure it out yourself
-        seed=input("Please input the seed, it should have been a number in a file named encrypted_file_seed.txt after your message: ")
-        try: # check if user is idiot
-            seed=int(seed) # after that we go on
-        except ValueError:
-            print("Invalid seed. Are you serious?") # user is idiot
-            input("Press enter to continue...")
-            return
-        random.seed(seed) # do something that i did in decrypt() i forgot
-        num_string=file.read()  # tell the computer to read why
-        num_string = re.sub(r"Seed:\s*\d+", "", num_string) # meant to remove (Seed:#seed) from the txt file
-        msg_string=num_string.split() # split the numbers 
-        word_list=[] # empty ahh table
-        for s in msg_string:
-            msg_string=int(s) 
-            msg_string=msg_string//random.randint(1,99) #revse the encryption
-            msg_string=msg_string//random.randint(1,99) 
-            word_list.append(msg_string)
-        with open('decrypted_file.txt', 'a') as f:
-            result_string= "".join(chr(word) for word in word_list)
-            print(result_string, file=f)
-        print("output sent to decrypted_file.txt") # gotta tell the user
-        input("Press enter to continue...")
-    except FileNotFoundError: 
-        print("File,", txtfile, "not found.") # user is stupid
-        input("Press enter to continue...")
+    random.seed(seed) # do something that i did in decrypt() i forgot
+    with open(txtfile, "r", encoding="utf-8", errors="replace") as file:
+        num_string = file.read()
+    num_string = re.sub(r"Seed:\s*\d+", "", num_string) # meant to remove (Seed:#seed) from the txt file
+    msg_string=num_string.split() # split the numbers 
+    word_list=[] # empty ahh table
+    for s in msg_string:
+        msg_string=int(s) 
+        msg_string=msg_string//random.randint(1,99) #revse the encryption
+        msg_string=msg_string//random.randint(1,99) 
+        word_list.append(msg_string)
+    with open('decrypted_file.txt', 'a') as f:
+        result_string= "".join(chr(word) for word in word_list)
+        print(result_string, file=f)
 
 main()
 # if you dont understand email me at paolov717@gmail.com
