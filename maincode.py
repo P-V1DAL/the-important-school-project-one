@@ -5,7 +5,6 @@
 # UPDATE: fully compatable with windows operatin systems on python 3.13.0
 # chromebook codespaces supported
 # mac: No
-# finally gui help help help help help helph elph le
 
 import tkinter as tk
 import random # import the random library
