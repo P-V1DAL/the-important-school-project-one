@@ -2,10 +2,6 @@ import random
 import tkinter as tk
 from tkinter import ttk, simpledialog, messagebox
 
-
-
-
-
 def encrypt(msg):
     """Encrypt message by seeding RNG, then multiplying each char code by two random ints.
     Returns the space-separated numeric ciphertext and the seed used."""
