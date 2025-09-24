@@ -10,11 +10,12 @@ import tkinter as tk
 import random # import the random library
 import re # an important search/replace library
 from tkinter import filedialog, simpledialog, messagebox
-
+import PIL
+from PIL import ImageTk, Image
 def main():
     root = tk.Tk()
     root.title("Encrypt / Decrypt Tool")
-    root.geometry("500x400")
+    root.geometry("1280x720")
     show_main_menu(root)
     root.mainloop()
 
@@ -25,11 +26,15 @@ def clear(root):
 def show_main_menu(root):
     clear(root)
     tk.Label(root, text="Do you want to encrypt or decrypt?", font=("Arial", 14)).pack(pady=20)
-
     tk.Button(root, text="Encrypt File", width=20,
               command=lambda: encryptchoice("file")).pack(pady=10)
     tk.Button(root, text="Decrypt File", width=20,
               command=lambda: decryptchoice("file")).pack(pady=10)
+    im = Image.open(r"rock.jpg")
+    im = ImageTk.PhotoImage(im)
+    label = tk.Label(root, image=im)
+    label.image = im
+    label.pack()
 
 def encryptchoice(_fmt="file"):
     # pick input file, then run encryptfile
